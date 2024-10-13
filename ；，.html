@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>相机</title>
+<style>
+  /* 在这里添加一些基本的样式 */
+  video, canvas {
+    border: 1px solid black;
+  }
+</style>
+</head>
+<body>
+
+<h1>拍照</h1>
+
+<!-- 用于显示摄像头视频流 -->
+<video id="video" width="640" height="480" autoplay></video>
+
+<!-- 按钮用于拍照 -->
+<button id="snap">拍照</button>
+
+<!-- 用于显示拍摄的照片 -->
+<canvas id="canvas" width="640" height="480"></canvas>
+
+<script>
+// 获取页面元素
+const video = document.getElementById('video');
+const canvas = document.getElementById('canvas');
+const snap = document.getElementById('snap');
+
+// 访问用户的摄像头
+navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+.then(stream => {
+  video.srcObject = stream;
+  video.play();
+})
+.catch(err => {
+  console.log('发生错误: ' + err);
+});
+
+// 拍照并将照片绘制到canvas上
+snap.addEventListener('click', () => {
+  const context = canvas.getContext('2d');
+  context.drawImage(video, 0, 0, 640, 480);
+
+  // 将canvas内容转换为dataURL
+  const dataURL = canvas.toDataURL('image/png');
+
+  // 创建一个a标签用于下载图片
+  const link = document.createElement('a');
+  link.href = dataURL;
+  link.download = 'photo.png'; // 设置下载的文件名
+
+  // 将a标签添加到文档中并触发点击事件来下载图片
+  document.body.appendChild(link);
+  link.click();
+
+  // 移除a标签
+  document.body.removeChild(link);
+
+  // 这里可以添加代码将图片保存到服务器或者本地文件夹
+  // 注意：由于浏览器的安全限制，无法直接通过JavaScript将文件保存到用户的文件系统中的特定文件夹
+});
+</script>
+
+</body>
+</html>
